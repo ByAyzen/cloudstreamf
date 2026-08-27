@@ -1784,13 +1784,13 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
             var prevId: Int? = null
             var prevView: View? = null
 
+            // The genius engineers at google did not actually
+            // write a nextFocus for the navrail
             rail.findViewById<View?>(R.id.navigation_home)?.nextFocusUpId =
                 R.id.home_change_api
             rail.findViewById<View?>(R.id.navigation_settings)?.nextFocusDownId =
                 R.id.nav_footer_profile_card
-            
-            // The genius engineers at google did not actually 
-            // write a nextFocus for the navrail
+
             for (id in arrayOf(
                 R.id.navigation_home,
                 R.id.navigation_search,
