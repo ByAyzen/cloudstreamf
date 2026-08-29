@@ -444,7 +444,10 @@ object AppContextUtils {
         )
     }
 
-    fun Context.filterProviderByPreferredMedia(hasHomePageIsRequired: Boolean = true): List<MainAPI> {
+    fun Context.filterProviderByPreferredMedia(
+        hasHomePageIsRequired: Boolean = true,
+        hasSearchIsRequired: Boolean = false,
+    ): List<MainAPI> {
         // We are getting the weirdest crash ever done:
         // java.lang.ClassCastException: com.lagradost.cloudstream3.TvType cannot be cast to com.lagradost.cloudstream3.TvType
         // Trying fixing using classloader fuckery
@@ -469,7 +472,11 @@ object AppContextUtils {
         val langs = this.getApiProviderLangSettings()
         val hasUniversal = langs.contains(AllLanguagesName)
         val allApis =
-            apis.filter { api -> (hasUniversal || langs.contains(api.lang)) && (api.hasMainPage || !hasHomePageIsRequired) }
+            apis.filter { api ->
+                (hasUniversal || langs.contains(api.lang)) &&
+                (api.hasMainPage || !hasHomePageIsRequired) &&
+                (api.hasSearch || !hasSearchIsRequired)
+            }
         return if (currentPrefMedia.isEmpty()) {
             allApis
         } else {

@@ -67,6 +67,7 @@ class APIRepository(val api: MainAPI) {
     private fun afterPluginsLoaded(forceReload: Boolean) {
         if (forceReload) {
             cache.clear()
+            api.clearLocalSearchCache()
         }
     }
 
@@ -80,6 +81,8 @@ class APIRepository(val api: MainAPI) {
     val mainUrl = api.mainUrl
     val mainPage = api.mainPage
     val hasQuickSearch = api.hasQuickSearch
+    val hasSearch = api.hasSearch
+    val hasLocalSearch = api.hasLocalSearch
     val vpnStatus = api.vpnStatus
 
     suspend fun load(url: String): Resource<LoadResponse> {

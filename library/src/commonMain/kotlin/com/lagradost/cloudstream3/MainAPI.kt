@@ -561,7 +561,12 @@ abstract class MainAPI {
     var sourcePlugin: String? = null
 
     open val hasMainPage = false
-    open val hasQuickSearch = false
+    open val hasQuickSearch: Boolean get() = hasLocalSearch
+    /** If this provider has search functionality. Set to false if the provider has no search function. */
+    open val hasSearch = true
+    open val hasSearchSupport: Boolean get() = hasSearch
+    /** If this provider automatically searches through its homepage/catalog in memory */
+    open val hasLocalSearch = false
 
     /**
      * The timeout on the `loadLinks` functions in milliseconds,
@@ -647,13 +652,76 @@ abstract class MainAPI {
         )
     }
 
+    /** Internal in-memory cache for local search */
+    private var localSearchCache: List<SearchResponse>? = null
+
+    /** Clears the local search in-memory cache */
+    fun clearLocalSearchCache() {
+        localSearchCache = null
+    }
+
+    /**
+     * Optional catalog for providers without an online search endpoint or homepage.
+     * When [hasLocalSearch] is true, if this returns items it will be preferred for local search.
+     */
+    open suspend fun getSearchCatalog(): List<SearchResponse>? = null
+
+    /**
+     * Internal local search implementation. Filters items from [getSearchCatalog] or [getMainPage].
+     */
+    open suspend fun searchLocal(query: String): List<SearchResponse> {
+        if (query.isBlank()) return emptyList()
+
+        val items = localSearchCache ?: run {
+            val catalog = try {
+                getSearchCatalog()
+            } catch (e: Throwable) {
+                null
+            }
+
+            if (!catalog.isNullOrEmpty()) {
+                catalog
+            } else if (hasMainPage && mainPage.isNotEmpty()) {
+                val collected = mutableListOf<SearchResponse>()
+                for (data in mainPage) {
+                    try {
+                        val response = getMainPage(1, MainPageRequest(data.name, data.data, data.horizontalImages))
+                        response?.items?.flatMap { it.list }?.let { collected.addAll(it) }
+                    } catch (e: Throwable) {
+                        // Ignore individual section failures
+                    }
+                }
+                collected
+            } else {
+                emptyList()
+            }.also { localSearchCache = it }
+        }
+
+        if (items.isEmpty()) return emptyList()
+
+        val keywords = query.trim().lowercase().split("\\s+".toRegex()).filter { it.isNotBlank() }
+        return items
+            .distinctBy { it.url }
+            .filter { item ->
+                if (item.name.isBlank()) return@filter false
+                val nameLower = item.name.lowercase()
+                keywords.all { keyword -> nameLower.contains(keyword) }
+            }
+    }
+
     // @WorkerThread
     open suspend fun search(query: String): List<SearchResponse>? {
+        if (hasLocalSearch) {
+            return searchLocal(query)
+        }
         throw NotImplementedError()
     }
 
     // @WorkerThread
     open suspend fun quickSearch(query: String): List<SearchResponse>? {
+        if (hasLocalSearch) {
+            return searchLocal(query)
+        }
         throw NotImplementedError()
     }
 

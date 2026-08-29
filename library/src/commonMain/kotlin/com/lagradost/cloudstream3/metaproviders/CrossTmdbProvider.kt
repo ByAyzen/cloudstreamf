@@ -32,7 +32,7 @@ class CrossTmdbProvider : TmdbProvider() {
     }
 
     private val validApis
-        get() = apis.filter { it.lang == this.lang && it::class != this::class }
+        get() = apis.filter { it.lang == this.lang && it::class != this::class && it.hasSearch }
     //.distinctBy { it.uniqueId }
 
     @Serializable
