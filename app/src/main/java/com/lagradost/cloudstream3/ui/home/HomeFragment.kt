@@ -378,6 +378,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
             }
         }
 
+        fun shouldHideSearch(apiName: String?): Boolean {
+            val currentApi = APIHolder.getApiFromNameNull(apiName)
+            return (apiName == noneApi.name) || (currentApi?.hasSearch == false) || (APIHolder.apis.none { it.hasSearch })
+        }
+
         fun Context.selectHomepage(selectedApiName: String?, callback: (String) -> Unit) {
             val validAPIs = filterProviderByPreferredMedia().toMutableList()
 
@@ -821,7 +826,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                 homeApiFab.text = displayApiName
                 homeChangeApi.text = displayApiName
                 homePreviewReloadProvider.isGone = (apiName == noneApi.name)
-                homePreviewSearchButton.isGone = (apiName == noneApi.name)
+                homePreviewSearchButton.isGone = shouldHideSearch(apiName)
             }
         }
 

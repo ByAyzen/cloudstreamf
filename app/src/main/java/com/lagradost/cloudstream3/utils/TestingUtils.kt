@@ -284,19 +284,24 @@ object TestingUtils {
                     val homePageList = (homepage as? TestResultList)?.results ?: emptyList()
 
                     // Test Search Results
-                    val searchQueries =
-                        // Use the random 3 home page results as queries since they are guaranteed to exist
-                        (homePageList.shuffled(Random).take(3).map { it.name.split(" ").first() } +
-                                // If home page is sparse then use generic search queries
-                                listOf("over", "iron", "guy")).take(3)
+                    val candidateItems: List<SearchResponse> = if (!api.hasSearch) {
+                        logger.log("Search disabled for provider, using homepage items")
+                        homePageList
+                    } else {
+                        val searchQueries =
+                            // Use the random 3 home page results as queries since they are guaranteed to exist
+                            (homePageList.shuffled(Random).take(3).map { it.name.split(" ").first() } +
+                                    // If home page is sparse then use generic search queries
+                                    listOf("over", "iron", "guy")).take(3)
 
-                    val searchResults = testSearch(api, searchQueries, logger)
-                    assertTrue("Failed to get search results", searchResults.success)
-                    searchResults as TestResultList
+                        val searchResults = testSearch(api, searchQueries, logger)
+                        assertTrue("Failed to get search results", searchResults.success)
+                        (searchResults as TestResultList).results
+                    }
 
                     // Test Load and LoadLinks
                     // Only try the first 3 search results to prevent spamming
-                    val success = searchResults.results.take(3).any { searchResponse ->
+                    val success = candidateItems.take(3).any { searchResponse ->
                         logger.log("Testing search result: ${searchResponse.url}")
                         val loadResponse = testLoad(api, searchResponse, logger)
                         if (loadResponse !is TestResultLoad) {

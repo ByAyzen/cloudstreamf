@@ -637,6 +637,7 @@ class HomeParentItemAdapterPreview(
             }
 
             (binding as? FragmentHomeHeadBinding)?.apply {
+                homeSearch.isGone = HomeFragment.shouldHideSearch(viewModel.apiName.value)
                 homeSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String): Boolean {
                         viewModel.queryTextSubmit(query)
@@ -783,6 +784,11 @@ class HomeParentItemAdapterPreview(
                         binding.homePreviewReloadProvider.isGone = (name == noneApi.name)
                     }
                 }*/
+                (binding as? FragmentHomeHeadBinding)?.apply {
+                    observe(viewModel.apiName) { name ->
+                        homeSearch.isGone = HomeFragment.shouldHideSearch(name)
+                    }
+                }
                 observe(viewModel.resumeWatching) {
                     updateResume(it)
                 }

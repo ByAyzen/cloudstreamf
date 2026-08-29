@@ -230,7 +230,9 @@ class SearchViewModel : ViewModel() {
 
             withContext(Dispatchers.IO) { // This interrupts UI otherwise
                 repos.filter { a ->
-                    (ignoreSettings || (providersActive.isEmpty() || providersActive.contains(a.name))) && (!isQuickSearch || a.hasQuickSearch)
+                    (ignoreSettings || (providersActive.isEmpty() || providersActive.contains(a.name))) &&
+                            (!isQuickSearch || a.hasQuickSearch) &&
+                            (isQuickSearch || a.hasSearch)
                 }.amap { a -> // Parallel
                     val search = if (isQuickSearch) a.quickSearch(query) else a.search(query, 1)
                     if (currentSearchIndex != currentIndex) return@amap

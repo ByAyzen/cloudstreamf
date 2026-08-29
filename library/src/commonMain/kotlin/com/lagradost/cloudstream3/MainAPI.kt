@@ -562,6 +562,8 @@ abstract class MainAPI {
 
     open val hasMainPage = false
     open val hasQuickSearch = false
+    /** If provider doesn't have search set to false, if it does set to true. */
+    open val hasSearch = true
 
     /**
      * The timeout on the `loadLinks` functions in milliseconds,

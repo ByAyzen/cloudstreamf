@@ -121,8 +121,10 @@ class QuickSearchFragment : BaseFragment<QuickSearchBinding>(
     }
 
     fun search(context: Context?, query: String, isQuickSearch: Boolean): Boolean {
-        (providers ?: context?.filterProviderByPreferredMedia(hasHomePageIsRequired = false)
-            ?.map { it.name }?.toSet())?.let { active ->
+        (providers ?: context?.filterProviderByPreferredMedia(
+            hasHomePageIsRequired = false,
+            hasSearchIsRequired = true
+        )?.map { it.name }?.toSet())?.let { active ->
             searchViewModel.searchAndCancel(
                 query = query,
                 ignoreSettings = false,

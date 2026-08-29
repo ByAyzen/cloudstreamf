@@ -18,6 +18,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
+import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
@@ -201,7 +202,10 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(
 
     private fun reloadRepos(success: Boolean = false) = main {
         searchViewModel.reloadRepos()
-        context?.filterProviderByPreferredMedia()?.let { validAPIs ->
+        context?.filterProviderByPreferredMedia(
+            hasHomePageIsRequired = false,
+            hasSearchIsRequired = true
+        )?.let { validAPIs ->
             bindChips(
                 binding?.tvtypesChipsScroll?.tvtypesChips,
                 selectedSearchTypes,
@@ -283,7 +287,10 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(
 
         binding.searchFilter.setOnClickListener { searchView ->
             searchView?.context?.let { ctx ->
-                val validAPIs = ctx.filterProviderByPreferredMedia(hasHomePageIsRequired = false)
+                val validAPIs = ctx.filterProviderByPreferredMedia(
+                    hasHomePageIsRequired = false,
+                    hasSearchIsRequired = true
+                )
                 var currentValidApis = listOf<MainAPI>()
                 val currentSelectedApis = if (selectedApis.isEmpty()) validAPIs.map { it.name }
                     .toMutableSet() else selectedApis

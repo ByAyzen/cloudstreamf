@@ -80,6 +80,7 @@ class APIRepository(val api: MainAPI) {
     val mainUrl = api.mainUrl
     val mainPage = api.mainPage
     val hasQuickSearch = api.hasQuickSearch
+    val hasSearch = api.hasSearch
     val vpnStatus = api.vpnStatus
 
     suspend fun load(url: String): Resource<LoadResponse> {
