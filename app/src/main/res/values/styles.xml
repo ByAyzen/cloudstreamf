@@ -472,9 +472,12 @@
     </style>
 
     <style name="AppBottomSheetDialogTheme">
-        <item name="android:windowIsFloating">true</item>
-        <!-- To remove the background dim of bottom sheets use android:backgroundDimEnabled -->
-        <!-- <item name="android:backgroundDimEnabled">false</item> -->
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.6</item>
+        <!-- Edge to edge will match status bar color when menu expanded. This will be more visually appealing. -->
+        <item name="enableEdgeToEdge">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">?attr/boxItemBackground</item>
         <item name="android:windowCloseOnTouchOutside">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
